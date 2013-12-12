@@ -6,7 +6,7 @@ import serial
 ser = serial.Serial(\
                     '/dev/cu.usbserial', \
                     9600, \
-                    timeout=0.1, \
+                    timeout=0.01, \
                     parity=serial.PARITY_NONE, \
                     bytesize=serial.EIGHTBITS, \
                     stopbits=serial.STOPBITS_ONE\
@@ -14,19 +14,41 @@ ser = serial.Serial(\
 # check the location
 print ser.name
 
+'''
+ser.write('v1=5')
 
-print 'Enter your commands below.\r\nInsert "exit" to leave the application.'
+ser.flushOutput()
+
+ser.write('v0=5')
+
+ser.flushOutput()
+'''
+
+#response = ser.readlines()
+#for x in response:
+#    print x
+
+def send_rcv(x):
+    
+
+ser.write('v1=5')
+
+ser.write('vipall?\n')
+
+response = ser.readlines()
+for x in response:
+    print x
 
 
-# get raw keyboard input (note that while loop will run forever unless exit is called)
 
-while True :
-    input = raw_input(">> ")
-    if input == 'exit':
-        ser.close
-        exit()
-    else:
-        ser.write(input + '\r\n')
-        response = ser.readlines()
-        for x in response:
-            print x
+
+ser.close
+
+
+
+
+
+
+
+
+
