@@ -26,11 +26,12 @@ class heater:
         self.serial.write(command + '\r\n')
         return_value = self.serial.readlines()
         return return_value[1]
+
     
     def multi_send(self, list):
         '''Send multiple commands and get a response'''
         for i in list:
-            return self.send_rcv(i)
+            self.send_rcv(i)
     
     def help(self):
         '''Help function'''
@@ -55,14 +56,18 @@ class heater:
 #create a heater called test
 test = heater(port = '/dev/cu.usbserial')
 
+
+
 test.send_rcv('v0=0')
 test.send_rcv('v1=0')
 test.send_rcv('v2=0')
 test.send_rcv('v3=0')
 test.send_rcv('v4=0')
 
+test.query_all()
+
 #trying to get multisend working so can write many voltages at once
-test.multi_send(['v0=1','v1=1','v2=1'])
+test.multi_send(['v0=1.11','v1=1.01','v2=0.9'])
 
 
 test.query_all()
