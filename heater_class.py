@@ -30,8 +30,8 @@ class heater:
     
     def multi_send(self, list):
         '''Send multiple commands and get a response'''
-        for i in list:
-            self.send_rcv(i)
+        for heater, voltage in enumerate(list):
+            self.send_rcv('v%d=%d' % (heater, voltage))
     
     def help(self):
         '''Help function'''
@@ -67,7 +67,7 @@ test.send_rcv('v4=0')
 test.query_all()
 
 #trying to get multisend working so can write many voltages at once
-test.multi_send(['v0=1.11','v1=1.01','v2=0.9'])
+test.multi_send([1,2,3,1])
 
 
 test.query_all()
