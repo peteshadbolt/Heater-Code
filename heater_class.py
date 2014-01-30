@@ -1,6 +1,7 @@
 import serial
 import time
 import qy
+import numpy
 
 class heater:
     '''This class speaks to the heater driver through a serial port'''
@@ -15,23 +16,52 @@ class heater:
         self.serial.bytesize=serial.EIGHTBITS
         self.serial.parity=serial.PARITY_NONE
         self.serial.stopbits=serial.STOPBITS_ONE
+        self.heaters=8
         try:
             self.serial.open()
             print 'Connected.'
         except serial.SerialException:
             print 'Failed!'
-    
+            
+#Serial excpetion doesn't work??
+
     def send_rcv(self, command):
-        '''Send a command and get a response'''
+        '''Send a single command and get a response'''
         self.serial.write(command + '\r\n')
         return_value = self.serial.readlines()
         return return_value[1]
 
+    def send_v(self, list):
+        '''Send multiple voltage commands and get a response'''
+        if len(list)==self.heaters:
+            for heater, voltage in enumerate(list):
+                self.send_rcv('v%d=%d' % (heater, voltage))
+            return 'voltages are %s' % (str(list))
+        else:
+            print 'I need %d voltages!' % (self.heaters)
     
-    def multi_send(self, list):
-        '''Send multiple commands and get a response'''
-        for heater, voltage in enumerate(list):
-            self.send_rcv('v%d=%d' % (heater, voltage))
+    def send_i(self, list):
+        '''Send multiple currents commands and get a response'''
+        if len(list)==self.heaters:    
+            for heater, current in enumerate(list):
+                self.send_rcv('i%d=%d' % (heater, current))
+            return 'currents are %s' % (str(list))
+        else:
+            print 'I need %d currents!' % (self.heaters)
+            
+    def send_p(self, list):
+        '''Send multiple powers commands and get a response'''
+        if len(list)==self.heaters:
+            for heater, power in enumerate(list):
+                self.send_rcv('p%d=%d' % (heater, power))
+            return 'powers are %s' % (str(list))
+        else:
+            print 'I need %d powers!' % (self.heaters)
+    
+    def zero(self):
+        '''zero all of the voltages'''
+        self.send_rcv('vall=0')
+        return 'all zero'
     
     def help(self):
         '''Help function'''
@@ -53,24 +83,21 @@ class heater:
         '''Close the connection to the heater driver'''
         print 'Disconnected from heater driver'
 
+# TODO max PVI and test.  Another question -- do I want the code to output what it has done?  i.e. all set to blah blah blah
+
+
+#TEST
+
 #create a heater called test
 test = heater(port = '/dev/cu.usbserial')
 
 
 
-test.send_rcv('v0=0')
-test.send_rcv('v1=0')
-test.send_rcv('v2=0')
-test.send_rcv('v3=0')
-test.send_rcv('v4=0')
-
+test.send_v([1,1,1,1,1,1,1])
 test.query_all()
 
-#trying to get multisend working so can write many voltages at once
-test.multi_send([1,2,3,1])
 
-
+print test.zero()
 test.query_all()
-
 
 test.kill()
