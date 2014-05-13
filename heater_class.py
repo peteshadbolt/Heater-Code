@@ -11,7 +11,7 @@ class heater:
         print 'Connecting to heater driver...'
         self.serial=serial.Serial()
         self.serial.port=port
-        self.serial.timeout=0.1
+        self.serial.timeout=1
         self.baudrate=9600
         self.serial.bytesize=serial.EIGHTBITS
         self.serial.parity=serial.PARITY_NONE
@@ -78,26 +78,53 @@ class heater:
         return_value = self.serial.readlines()
         for i in return_value:
             print i
-    
+	
+    def dict(self):
+		'''dictionary for vip'''
+		command = 'vipall?'
+		self.serial.write(command + '\r\n')
+		return_value = self.serial.readlines()
+		i = 1
+		voltages = []
+		currents = []
+		powers = []
+		while i < len(return_value): 
+			voltages.append(float(return_value[i].split()[1]))
+			currents.append(float(return_value[i].split()[3]))
+			powers.append(float(return_value[i].split()[5]))
+			i+=1
+		return {'voltages':voltages,'currents':currents,'powers':powers}
+			
+			
     def kill(self):
-        '''Close the connection to the heater driver'''
-        print 'Disconnected from heater driver'
+		'''Close the connection to the heater driver'''
+		self.serial.close()
+		print 'Disconnected from heater driver'
 
 # TODO max PVI and test.  Another question -- do I want the code to output what it has done?  i.e. all set to blah blah blah
 
 
 #TEST
+if __name__=='__main__':
 
-#create a heater called test
-test = heater(port = '/dev/cu.usbserial')
+	#create a heater called test
+	test = heater(port = 'COM10')
 
+	print test.send_rcv('v1=1')
 
+	test.send_v([1,1,1,1,1,1,1,0])
 
-test.send_v([1,1,1,1,1,1,1])
-test.query_all()
+	test_dict=test.dict()
+	print test_dict
 
+	'''
+					command = 'vipall?'
+			self.serial.write(command + '\r\n')
+			return_value = self.serial.readlines()
+			return return_value[1].split()[1]
+	'''
 
-print test.zero()
-test.query_all()
+	print test.zero()
+	#test.query_all()
 
-test.kill()
+	test.kill()
