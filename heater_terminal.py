@@ -4,7 +4,7 @@ import serial
 
 # open the serial port on my mac
 ser = serial.Serial(\
-                    '/dev/cu.usbserial', \
+                    'COM10', \
                     9600, \
                     timeout=0.1, \
                     parity=serial.PARITY_NONE, \

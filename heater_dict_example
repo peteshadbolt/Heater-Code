@@ -1,0 +1,18 @@
+
+
+
+class heaters:
+    def __init__(self, callback):
+        awd
+
+    def cool():
+        for i in range(100):
+            sleep(1)
+            callback('Im cooling, n seconds to go')
+
+    def dict():
+        output={}
+        for each of my heaters:
+            output[heater index] = {'voltage': voltage, 'phase':phase, current}
+            {'voltages':[1,2,3,4,5]}
+        return
