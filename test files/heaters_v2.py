@@ -51,17 +51,17 @@ class heater:
         assert(all([response=='OK' for response in responses]))
         return responses
 
-    def send_v(self, voltages):
+    def send_voltages(self, voltages):
         '''Send multiple voltage commands and get a response'''
         self.iterate_and_check('v', voltages)
         return 'voltages are %s' % (str(voltages))
     
-    def send_i(self, currents):
+    def send_currents(self, currents):
         '''Send multiple currents commands and get a response'''
         self.iterate_and_check('i', currents)
         return 'currents are %s' % (str(currents))
             
-    def send_p(self, powers):
+    def send_powers(self, powers):
         '''Send multiple powers commands and get a response'''
         self.iterate_and_check('p', powers)
         return 'powers are %s' % (str(powers))
@@ -112,18 +112,21 @@ class heater:
 if __name__=='__main__':
 
     # Create a heater called test
-    test = heater(port = 'COM10')
+    test = heater(port = '/dev/cu.usbserial')
 
     # Test it
     print test.send_rcv('v1=0')
-    print test.send_v([0,0,0,0,0,0,0,0])
-    print test.send_i([0,0,0,0,0,0,0,0])
-    print test.send_p([0,0,0,0,0,0,0,0])
+    time.sleep(1)
+    print test.send_voltages([0,0,0,0,0,0,0.0])
+    time.sleep(1)
+    print test.send_currents([0,0,0,0,0,0,0,0])
+    time.sleep(1)
+    print test.send_powers([0,0,0,0,0,0,0,0])
+    time.sleep(1)
     print test.zero()
+    time.sleep(1)
     print test.query_all()
     pprint(test.dict())
 
-    raw_input('\nPress enter!')
-    test.help()
 
     test.kill()
