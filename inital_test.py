@@ -14,17 +14,15 @@ Inital testing
 if __name__=='__main__':
 	
 	# Where to put to data
-	metadata={'label':'Peltier Testing', 'test':'thermistor characterisation', 'temperature': '20.00', 'notes': 'thermistor on heater 01, bias at 10V'}
-	output_file = ctx('C:/Users/Qubit/Desktop/Heater-Code/thermistor_characterisation/', metadata=metadata)
+	metadata={'label':'Peltier Testing', 'test':'thermistor characterisation', 'temperature': '20.0', 'notes': 'thermistor on heater 01, bias at 10V'}
+	output_file = ctx('C:/Users/Qubit/Desktop/Heater-Code/thermistor_characterisation/10V_Bias', metadata=metadata)
 
 	
 	
 	reck_heaters = heaters(port = 'COM10')
-	
 	print reck_heaters.send_voltages([0,10,0,0,0,0,0,0])
 	pprint(reck_heaters.dict())
-	output_file.write('20.00', reck_heaters.dict())
-
+	output_file.write('20.0', reck_heaters.dict())
 	
 	print reck_heaters.zero()
 	reck_heaters.kill()

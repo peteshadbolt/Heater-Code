@@ -13,12 +13,12 @@ Code to set a voltage and periodically write the readings from the heaters to a 
 
 if __name__=='__main__':
     
-	# Bias voltage for thermistor
+
 	v = 1
 	
 	# Where to put to data
-	metadata={'label':'Peltier Testing', 'test': 'apply voltage wait ten seconds then turn off','voltages': v, 'peltier' : 'off'}
-	output_file = ctx('C:/Users/Qubit/Desktop/Heater-Code/peltier_characterisation/', metadata=metadata)
+	metadata={'label':'Peltier Testing', 'test': 'apply voltage wait ten seconds then turn off, try 1v bias','voltages': v, 'peltier' : 'on'}
+	output_file = ctx('C:/Users/Qubit/Desktop/Heater-Code/heat_10s_turnoff/Peltier_on/', metadata=metadata)
 
 	# Number of steps, not heater.dict() takes 0.34 seconds to call = max rep rate
 	steps = 50

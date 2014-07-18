@@ -8,40 +8,33 @@ import numpy as np
 
 from heater_class import heater
 
-''' 
-An example of fringe-taking, without a GUI 
-'''
- 
 if __name__=='__main__':
-    
 
 	def handle_data(data):
-		''' Define how to handle data coming from the counting system '''
-
-		key, value = data
-		print data
-		if key=='coincidence_data':
-			# We got some count rates
-			count_rates=value['count_rates']
-			# together with the context in which they were measured
-			context=value['context']
-
-			# Print out some stuff
-			print 'Recieved data for heater setting %s' % str(context['voltages'])
-			if 'n' in count_rates: print 'n: %d' % count_rates['n']
+			''' Define how to handle data coming from the counting system '''
+			key, value = data
+			#print data
+			if key=='coincidence_data':
+				# We got some count rates
+				count_rates=value['count_rates']
+				# together with the context in which they were measured
+				context=value['context']
 			
-			# Write full context information to disk
-			output_file.write('context', context)
-			# A less verbose alternative: 
-			# output_file.write('position', context[which_motor]['position'])
-			# Write count rates to disk
-			output_file.write('count_rates', count_rates)
-		
-		
-    ##################################################### 
-    # START HERE 
-    ##################################################### 
-	
+				# Print out some stuff
+				print 'Recieved data for heater setting %s' % str(context[0])
+				if 'n' in count_rates: print 'n: %d' % count_rates['n']
+				
+				# Write full context information to disk
+				output_file.write('Heater context', context)
+				# A less verbose alternative: 
+				# output_file.write('position', context[which_motor]['position'])
+				# Write count rates to disk
+				output_file.write('count_rates', count_rates)
+
+	##################################################### 
+	# START HERE 
+	##################################################### 
+
 	# Get a file ready to store data
 	metadata={'label':'This is a test!', 'mood':'hungry for knowledge'}
 	output_file=ctx('C:/Users/Qubit/Desktop/data_from_example_scripts/', metadata=metadata)
@@ -52,10 +45,10 @@ if __name__=='__main__':
 	v3 = [3,0,0,0,0,0,0,0]
 	v4 = [4,0,0,0,0,0,0,0]
 	v_list = [v1, v2, v3, v4]
-	
+
 	# Connect to the heaters
 	test_heaters = heater(port = 'COM10')
-	
+
 	# Connect to the counting gear and configure it
 	counter=coincidence_counter(callback=handle_data)
 	counter.set_integration_time(1)
@@ -72,3 +65,4 @@ if __name__=='__main__':
 	# Close connections to hardware
 	counter.kill()
 	test_heaters.kill()
+			
