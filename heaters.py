@@ -23,9 +23,11 @@ class heaters:
         self.serial.parity=serial.PARITY_NONE
         self.serial.stopbits=serial.STOPBITS_ONE
         self.heaters=8
+        # Note vipall doesn't work for all heaters yet so leave self.heaters=8.  The heaters will still apply voltages
+        self.actual_heaters=23
         self.heater_boards=3
-        self.vmax = 5
-		# Note vipall doesn't work for all heaters yet so leave self.heaters=8.  The heaters will still apply voltages
+        self.vmax = 12
+        
         try:
             self.serial.open()
             print 'Connected.'
@@ -34,7 +36,7 @@ class heaters:
         
         self.set_max_voltages([self.vmax]*23)
     #TO DO: Fix readline, when talking to heaters > 8
-	
+    
     def send_rcv(self, command):
         ''' Send a command, and return the response from the board '''
         self.serial.write(command + '\n')
@@ -56,7 +58,7 @@ class heaters:
         responses=self.iterate(prefix, values)
         #print responses
         if not all([response=='OK' for response in responses]):
-			self.kill()
+            self.kill()
         assert(all([response=='OK' for response in responses])), responses
         return responses
     
@@ -70,9 +72,10 @@ class heaters:
         prefix = 'v'
         command = '%s%d=%.9f' % (prefix, heater, voltage)
         response = self.send_rcv(command)
-        if response != 'OK':
-			self.kill()
+        #if response != 'OK':
+            #self.kill()
         assert(response=='OK'), response
+        print 'voltage is %s' % (str(voltage))
         return 'voltage is %s' % (str(voltage))
         
     def send_voltages(self, voltages):
@@ -91,27 +94,56 @@ class heaters:
         return 'powers are %s' % (str(powers))
     
     def zero(self):
-		'''zero all of the voltages'''
-		self.serial.write('vall=0' + '\n')
-		parrot=self.serial.readline() # The board "parrots" our command back to us
-		for i in range(self.heater_boards):
-			response=self.serial.readline()
-			assert(response.strip()=='OK'), response
-		return 'all zero'
+        '''zero all of the voltages'''
+        self.serial.write('vall=0' + '\n')
+        parrot=self.serial.readline() # The board "parrots" our command back to us
+        for i in range(self.heater_boards):
+            response=self.serial.readline()
+            assert(response.strip()=='OK'), response
+        return 'all zero'
     
-	#TODO make a dictionary not reliant on 'vipall' but query the board with vi? for i 1 to heaters
-    def dict(self):
-		''' Dictionary for vip '''
-		self.serial.write('vipall?\n')
-		parrot = self.serial.readline() # The board "parrots" our command back to us
-		output={}
-		for i in range(self.heaters):
-			s = self.serial.readline().replace(':',' ').split()
-			voltage, current, power = float(s[1]), float(s[3]), float(s[5])
-			this_heater={'voltage': voltage, 'current': current, 'power': power}
-			output[i]=this_heater
-		return output
+    def query_v(self, heater_index):
+        return self.send_rcv('v'+str(heater_index)+'?')
 
+    def query_i(self, heater_index):
+        return self.send_rcv('i'+str(heater_index)+'?')
+    
+    def query_p(self, heater_index):
+        return self.send_rcv('p'+str(heater_index)+'?')
+    
+    def vip_heater(self, heater_index):
+        output = {}
+        voltage = float(self.query_v(heater_index).split()[0])
+        current = float(self.query_i(heater_index).split()[0])
+        power = float(self.query_p(heater_index).split()[0])
+        this_heater={'voltage': voltage, 'current': current, 'power': power}
+        output[heater_index] = this_heater
+        return output
+        
+    def vipall(self):
+        '''Return vip information for all heaters'''
+        output = {}
+        for i in range(self.actual_heaters):
+            voltage = float(self.query_v(i).split()[0])
+            current = float(self.query_i(i).split()[0])
+            power = float(self.query_p(i).split()[0])
+            this_heater={'voltage': voltage, 'current': current, 'power': power}
+            output[i] = this_heater
+        return output 
+     
+    #TODO make a dictionary not reliant on 'vipall' but query the board with vi? for i 1 to heaters
+    def dict(self):
+        ''' Dictionary for vip '''
+        self.serial.write('vipall?\n')
+        parrot = self.serial.readline() # The board "parrots" our command back to us
+        output={}
+        for i in range(self.heaters):
+            s = self.serial.readline().replace(':',' ').split()
+            voltage, current, power = float(s[1]), float(s[3]), float(s[5])
+            this_heater={'voltage': voltage, 'current': current, 'power': power}
+            output[i]=this_heater
+        return output
+           
     def help(self):
         ''' Help function '''
         # We don't actually know how long the help message will be. 
@@ -128,58 +160,58 @@ class heaters:
         self.serial.close()
         print 'Disconnected from heater driver'
 
-	
-		# TODO -- a smart way to do VMAX on all
-		
+    
+        # TODO -- a smart way to do VMAX on all
+        
 #TEST
 if __name__=='__main__':
 
-	# Create a heater called test
-	#   test = heaters(port = '/dev/cu.usbserial')
-	test = heaters(port = 'COM10')
+    # Create a heater called test
+    #   test = heaters(port = '/dev/cu.usbserial')
+    test = heaters(port = 'COM10')
+
+    #print test.zero()
+    #test.kill()
+    #test.send_one_voltage(1,10)
+
+    #test.kill()
+
+    '''
+    test.send_one_voltage(3,4)
+    pprint(test.dict())
+    test.kill()
+    '''
+
+    test.zero()
+    pprint(test.dict())
+
+    test.send_one_voltage(3,2)
+    pprint(test.dict())
+
+    test.send_one_voltage(3,7)
+    pprint(test.dict())
+
+
+
+    test.kill()
+
+
+    '''
+    # Test it
+    print test.send_rcv('v1=0')
+    time.sleep(1)
+    print test.send_voltages([0,0,0,0,0,0,0])
+    time.sleep(1)
+    print test.send_currents([0,0,0,0,0,0,0,0])
+    time.sleep(1)
+    print test.send_powers([0,0,0,0,0,0,0,0])
+    time.sleep(1)
+    print test.zero()
+    time.sleep(1)
+    print test.query_all()
+    pprint(test.dict())
+    '''
+
     
-	#print test.zero()
-	#test.kill()
-	#test.send_one_voltage(1,10)
-	
-	#test.kill()
-	
-	'''
-	test.send_one_voltage(3,4)
-	pprint(test.dict())
-	test.kill()
-	'''
-	
-	test.zero()
-	pprint(test.dict())
-	
-	test.send_one_voltage(3,2)
-	pprint(test.dict())
-	
-	test.send_one_voltage(3,7)
-	pprint(test.dict())
-	
-	
-	
-	test.kill()
-	
-
-	'''
-	# Test it
-	print test.send_rcv('v1=0')
-	time.sleep(1)
-	print test.send_voltages([0,0,0,0,0,0,0])
-	time.sleep(1)
-	print test.send_currents([0,0,0,0,0,0,0,0])
-	time.sleep(1)
-	print test.send_powers([0,0,0,0,0,0,0,0])
-	time.sleep(1)
-	print test.zero()
-	time.sleep(1)
-	print test.query_all()
-	pprint(test.dict())
-	'''
-
-	
-	
-	
+    
+    

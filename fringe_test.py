@@ -5,6 +5,7 @@ from qy.formats import ctx
 from qy.hardware import smc100
 import qy.settings
 import numpy as np
+from heaters import heaters
 
 from heater_class import heater
 
@@ -13,7 +14,7 @@ if __name__=='__main__':
 	def handle_data(data):
 			''' Define how to handle data coming from the counting system '''
 			key, value = data
-			#print data
+			print data
 			if key=='coincidence_data':
 				# We got some count rates
 				count_rates=value['count_rates']

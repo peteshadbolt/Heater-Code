@@ -15,12 +15,12 @@ and also initially off and the on halfway through.
 if __name__=='__main__':
     
 
-	v = 12
+	v = 5
 	bias = 10
 	
 	# Where to put to data
-	metadata={'label':'Peltier Testing', 'test': 'complete heater test. no voltage. voltage. no voltage','voltages': v, 'peltier' : 'on'}
-	output_file = ctx('C:/Users/Qubit/Code/lab_code/Heater-Code/peltier_response_tests/Peltier_off', metadata=metadata)
+	metadata={'label':'Peltier Testing', 'test': 'complete heater test. just apply voltage, observe change in temp ','voltages': v, 'peltier' : 'off'}
+	output_file = ctx('C:/Users/Qubit/Code/lab_code/heater_testing/peltier_response_tests/Peltier_off', metadata=metadata)
 	
 	# Create some heaters
 	reck_heaters = heaters(port = 'COM10')
