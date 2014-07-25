@@ -54,7 +54,22 @@ if __name__=='__main__':
                     print 'Loop %r out of %r' %(j+1, loops)
                     #output_file.write(time.time()-start, reck_heaters.vipall())
                     #out = reck_heaters.vip_heater(heater_index)
-                    output_file.write(time.time()-start, reck_heaters.vip_heater(heater_index))
+                    #output_file.write(time.time()-start, reck_heaters.vip_heater(heater_index))
+
+                    # This will make your life easier in the long run
+                    output_file.write('elapsed_time', time.time()-start)
+                    output_file.write('heater_state', reck_heaters.vip_heater(heater_index))
+
+                    '''
+                    Now, when you want to read the file, you can say (pseudocode, but only just):
+                        file=ctx(filename)
+                        times=file.stream('elapsed_time')
+                        states=file.stream('heater_state')
+                        assert(len(times)==len(states))
+                        voltages=[state['voltage'] for state in states]
+                        plot(times, voltages)
+                    '''
+
                     #volts.append(out[heater_index]['voltage'])
                     #currents.append(out[heater_index]['current'])
                     time.sleep(1)
